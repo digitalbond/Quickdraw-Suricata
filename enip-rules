@@ -7,7 +7,7 @@
 #	Version 1.1	02/27/2011	Changed reference to reflect new web site
 #	Version 1.2	09/29/2017	Updated all enip Snort preprocessors rules for use with Suricata enip and cip keywords
 #
-#
+# 
 #----------------------------------------------------------
 #
 # All EtherNet/IP rules in this file use the Suricata enip and cip keywords that were added in R3.2. 
@@ -30,12 +30,29 @@
 #  Value: decimal value of the CIP service to match on
 #  Dependencies: preprocessor enip must be active; matches only if the matching reply packet is also recorded by the session
 #
-#  Keyword: enip_command:<value>
+#  Keyword: enip_command:<value>   (NOTE: None of the rules below use the enip_command keyword)
 #  Purpose: matches on the CIP response field of a packet
 #  Value: decimal value of the CIP response
 #  Dependencies: preprocessor enip must be active
 #
 #----------------------------------------------------------
+#
+#  Rules Summary:
+#  SID: 1111501 - 1111504 => Reboot or Restart
+#  SID: 1111505 - 1111506 => Unlock Rockwell PLC
+#  SID: 1111507 - 1111510 => Lock Rockwell PLC
+#  SID: 1111511 - 1111512,  1111519 - 1111520 => Stop Detected
+#  SID: 1111513 - 1111514 => Rockwell, Remote Mode Change Attempt
+#  SID: 1111515 - 1111516 => Rockwell, Software Upload
+#  SID: 1111517 - 1111518 => TCP/UDP ENIP Identity Request
+#
+#  SID's: 1111505, 1111506, 1111507, 1111508, 1111509, 1111510, 1111513, 1111514, 1111515, & 1111516 have
+#  a threshold of 1 alert per second that was based on the sample pcaps.
+#  
+#  The CL5000eip pcaps can be used to test that your Suricata deployment is working properly
+#
+#----------------------------------------------------------
+
 alert enip !$ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Reboot or Restart from Unauthorized Client"; cip_service:5; \
 reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:denial-of-service; sid:1111501; rev:1; priority:1;)
 
@@ -71,15 +88,7 @@ reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:misc-a
 alert enip $ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Lock Rockwell PLC Attempt from Authorized Client"; cip_service:78; \
 threshold: type limit, track by_src, seconds 1, count 1; \
 reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:misc-attack; sid:1111510; rev:1; priority:2;)
-#
-# #Alert enip !$ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Unauthorized Client"; \
-# #flow:to_server,established; flowbits:isset,ktime; cip_service:7; reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; \
-# #classtype:denial-of-service; flowbits:set,detstop; sid:1111511; rev:1; priority:2;)
-#
-# #Alert enip $ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Authorized Client"; \
-# #flow:to_server,established; flowbits:isset,ktime; cip_service:7; reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; \
-# #classtype:denial-of-service; flowbits:set,detstop; sid:1111512; rev:1; priority:2;)
-#
+ 
 alert enip !$ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Unauthorized Client"; \
 flow:to_server,established; cip_service:7; reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; \
 classtype:denial-of-service; flowbits:set,detstop; sid:1111511; rev:1; priority:2;)
@@ -111,12 +120,11 @@ reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:misc-a
 alert enip $ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Rockwell, Software Upload from Authorized Client"; cip_service:79; \
 threshold: type limit, track by_src, seconds 1, count 1; \
 reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:misc-attack; sid:1111516; rev:1;)
-#
-#
+
 # Alert on a Request Identity command that was sent via Redpoint Nmap NSE
 alert tcp any any -> any 44818 (content: "|63|"; offset: 0; depth: 1; content: "|C1 DE BE D1|"; offset: 16; depth: 4; \
 msg: "TCP EtherNet/IP Request Identity Attempt Via Redpoint Nmap NSE"; sid:1111517; priority:3;)
-#
+
 # Alert on a Request Identity command that was sent via Redpoint Nmap NSE
 alert udp any any -> any 44818 (content: "|63|"; offset: 0; depth: 1; content: "|C1 DE BE D1|"; offset: 16; depth: 4; \
 msg: "UDP EtherNet/IP Request Identity Attempt Via Redpoint Nmap NSE"; sid:1111518; priority:3;)

@@ -105,12 +105,6 @@ alert enip $ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - St
 flow:to_server,established; cip_service:7; reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; \
 classtype:denial-of-service; flowbits:set,detstop; sid:1111512; rev:1; priority:2;)
 
-alert enip !$ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Unauthorized Client"; cip_service:7; \
-reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:denial-of-service; sid:1111519; rev:1; priority:2;)
-
-alert enip $ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Authorized Client"; cip_service:7; \
-reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:denial-of-service; sid:1111520; rev:1; priority:2;)
-
 alert enip !$ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Rockwell, Remote Mode Change Attempt from Unauthorized Client"; \
 flow:to_server,established; flowbits:isset,detstop; cip_service:76; \
 threshold: type limit, track by_src, seconds 1, count 1; \
@@ -136,3 +130,11 @@ msg: "TCP EtherNet/IP Request Identity Attempt Via Redpoint Nmap NSE"; sid:11115
 # Alert on a Request Identity command that was sent via Redpoint Nmap NSE
 alert udp any any -> any 44818 (content: "|63|"; offset: 0; depth: 1; content: "|C1 DE BE D1|"; offset: 16; depth: 4; \
 msg: "UDP EtherNet/IP Request Identity Attempt Via Redpoint Nmap NSE"; sid:1111518; priority:3;)
+
+alert enip !$ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Unauthorized Client"; cip_service:7; \
+reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:denial-of-service; sid:1111519; rev:1; priority:2;)
+
+alert enip $ENIP_CLIENT any -> $ENIP_SERVER 44818 (msg:"SCADA_IDS: ENIP/CIP - Stop Detected from Authorized Client"; cip_service:7; \
+reference:url,digitalbond.com/tools/quickdraw/ethernetip-rules; classtype:denial-of-service; sid:1111520; rev:1; priority:2;)
+
+

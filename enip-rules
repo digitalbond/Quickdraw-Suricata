@@ -12,9 +12,9 @@
 # later versions of Snort and the EtherNet/IP ruleset that relied on the preprocessor were removed. Suricata R3.2 added 
 # the capability in the older Snort prepocessor including two keywords that could be used in the rules.
 # 
-# A team at N-Dimension Solution, with the assistance of Solana Networks, updated and tested the rules to work with
+# A team at N-Dimension Solutions, with the assistance of Solana Networks, updated and tested the rules to work with
 # Suricata and EtherNet/IP keywords. This work was completed as part of a project with Public Safety Canada and Defence R&D 
-# Canada. Version 1.2 you see here is due to the good work of N-Dimension Solution and Solana Networks.
+# Canada. Version 1.2 you see here is due to the good work of N-Dimension Solutions and Solana Networks.
 #
 #----------------------------------------------------------
 #
